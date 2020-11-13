@@ -32,7 +32,72 @@
 
 ### ServletRequset接口
 
-> Servlet容器对于接受到的每一个Http请求，都会创建一个ServletRequest对象，并把这个对象传递给Servlet的Sevice( )方法
+> Servlet容器对于接受到的每一个Http请求，<u>都会创建一个ServletRequest对象，并把这个对象传递给Servlet的Sevice( )方法</u>
+>
+> ```java
+> public interface ServletRequest {
+>     int getContentLength();//返回请求主体的字节数
+>     String getContentType();//返回主体的MIME类型
+>     String getParameter(String var1);//返回请求参数的值
+> }
+> ```
+
+getParameter是在ServletRequest中最常用的方法，可用于获取查询字符串的值。
+
+### ServletResponse接口
+
+> 表示一个Servlet响应，在调用Servlet的Service( )方法前，<u>Servlet容器会先创建一个ServletResponse对象，并把它作为第二个参数传给Service( )方法</u>
+>
+> 
+>
+> ```java
+> public interface ServletResponse {
+> String getCharacterEncoding();
+> String getContentType();
+> ServletOutputStream getOutputStream() throws IOException;
+> PrintWriter getWriter() throws IOException;
+> void setCharacterEncoding(String var1);
+> void setContentLength(int var1);
+> void setContentType(String var1);
+> void setBufferSize(int var1);
+> int getBufferSize();
+> void flushBuffer() throws IOException;
+> void resetBuffer();
+> boolean isCommitted(); 
+> void reset();
+> void setLocale(Locale var1);
+> Locale getLocale();
+> ```
+> }
+
+在发送任何HTML之前，应该先调用setContentType（）方法，设置响应的内容类型，并将“text/html”作为一个参数传入，这是在告诉浏览器响应的内容类型为HTML，需要以HTML的方法解释响应内容而不是普通的文本，或者也可以加上“charset=UTF-8”改变响应的编码方式以防止发生中文乱码现象。
+
+### ServletConfig接口
+
+> 当Servlet容器初始化Servlet时，Servlet容器会给Servlet的init( )方式传入一个ServletConfig对象。
+
+### ServletContext对象
+
+>  ServletContext对象表示Servlet应用程序。每个Web应用程序都只有一个ServletContext对象
+>
+> 有了ServletContext对象，就可以共享从应用程序中的所有资料处访问到的信息，并且可以动态注册Web对象。前者将对象保存在ServletContext中的一个内部Map中
+>
+> ServletContext就是一个“域对象”，它存在于整个应用中，并在在整个应用中有且仅有1份，它表示了当前整个应用的“状态”，你也可以理解为某个时刻的ServletContext代表了这个应用在某个时刻的“一张快照”，这张“快照”里面包含了有关应用的许多信息，应用的所有组件都可以从ServletContext获取当前应用的状态信息
+
+### ServletContextListener
+
+> ServletContextListener是一个接口，我们随便写一个类，只要这个类实现了ServletContextListener接口，那么这个类就实现了【监听ServletContext】的功能
+>
+> ```java
+> package javax.servlet;
+> import java.util.EventListener;
+> public interface ServletContextListener extends EventListener {
+>     void contextInitialized(ServletContextEvent var1);
+>     void contextDestroyed(ServletContextEvent var1);
+> }
+> ```
+>
+> 
 
 ### Javax.servlet.http
 
@@ -47,3 +112,31 @@
 ## 用Servlet下载二进制文件
 
 你可以通过给`ServletContext`的getResourceAsStream() 方法传一个路径，获得一个你需要下载(被存在服务器的文件系统中)的文件的引用。这将返回一个`InputStream`对象可以用来读取文件内容。然后创建一个字节缓冲区，用于读取文件时从文件中获取数据块。最后真正的任务是读取文件内容并将它们复制到输出流中。这是通过使用一个while循环，这将不断读取`InputStream`直到文件结束。使用循环将数据块读入并写入输出流。在这之后，`ServletOutputStream` 对象flush方法被调用，来清除内容和释放资源。
+
+## Servlet、Servlet容器、Tomcat
+
+### Servlet容器:
+
+> Servlet容器也叫做Servlet引擎，是Web服务器或应用程序服务器的一部分，用于在发送的请求和响应之上提供网络服务，解码基于 MIME的请求，格式化基于MIME的响应。==Servlet没有main方法，不能独立运行，它必须被部署到Servlet容器中，由容器来实例化和调用 Servlet的方法（如doGet()和doPost()），Servlet容器在Servlet的生命周期内包容和管理Servlet。==在JSP技术 推出后，管理和运行Servlet/JSP的容器也称为Web容器。
+
+### Tomcat
+
+> Tomcat是一个免费的开放源代码的Servlet容器。
+>
+> Tomcat服务器接受客户请求并做出响应的过程如下：
+>
+> 1）客户端（通常都是浏览器）访问Web服务器，发送HTTP请求。
+> 2）Web服务器接收到请求后，传递给Servlet容器。
+> 3）Servlet容器加载Servlet，产生Servlet实例后，向其传递表示请求和响应的对象。
+> 4）Servlet实例使用请求对象得到客户端的请求信息，然后进行相应的处理。
+> 5）Servlet实例将处理结果通过响应对象发送回客户端，容器负责确保响应正确送出，同时将控制返回给Web服务器。
+
+![image-20201113182316535](https://raw.githubusercontent.com/TestLove/Pictures/main/img/7tDpNOXqMjRYJH8.png)
+
+- Server 元素表示整个 Catalina servlet 容器。
+- Service元素表示一个或多个连接器组件的组合，这些组件共享一个用于处理传入请求的引擎组件。Server 中可以有多个 Service。
+- Executor表示可以在Tomcat中的组件之间共享的线程池。
+- Connector代表连接组件。Tomcat 支持三种协议：HTTP/1.1、HTTP/2.0、AJP。
+- Context元素表示一个Web应用程序，它在特定的虚拟主机中运行。每个Web应用程序都基于Web应用程序存档（WAR）文件，或者包含相应的解包内容的相应目录，如Servlet规范述。
+- Engine元素表示与特定的Catalina服务相关联的整个请求处理机器。它接收并处理来自一个或多个连接器的所有请求，并将完成的响应返回给连接器，以便最终传输回客户端。
+- Host元素表示一个虚拟主机，它是一个服务器的网络名称（如“www.testlove.cn”）与运行Tomcat的特定服务器的关联。
