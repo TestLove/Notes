@@ -48,24 +48,23 @@ public class WrapperClass {
 }
 
 ~~~
-#### JDK1.5以后
+##### JDK1.5以后
 
-
+自动装箱与自动拆箱
 
 ### 数组的定义
 
 #### 一维数组
 
 ~~~java
-
+int []a=new int[10];
+int[]a={1,2,3};
 
 ~~~
 
 #### 多维数组
 
 ~~~java
-
-
 
 ~~~
 
@@ -77,9 +76,15 @@ public class WrapperClass {
 
 #### final
 
+- 修饰的类为最终类(不可被继承)
+- 修饰的方法不可被子类重写
+- 修饰的属性为常量
+
 #### static
 
 #### finally
+
+> finally语句块里的语句必须被执行
 
 finally中的return会覆盖前面的return
 
@@ -87,13 +92,11 @@ finally中的return会覆盖前面的return
 
 ### 类
 
+
+
 #### 抽象类
 
-含有abstract修饰符的class即为抽象类，abstract类不能创建的实例对象。含有abstract方法的类必须定义为abstract class，abstract class类中的方法不必是抽象的。abstract class
-
-类中定义抽象方法必须在具体
-
-(Concrete)子类中实现，所以，不能有抽象构造方法或抽象静态方法。如果的子类没有实现抽象父类中的所有抽象方法，那么子类也必须定义为abstract类型。
+> 含有abstract修饰符的class即为抽象类，abstract类不能创建的实例对象。含有abstract方法的类必须定义为abstract class，abstract class类中的方法不必是抽象的。abstract class类中定义抽象方法必须在具体(Concrete)子类中实现，所以，不能有抽象构造方法或抽象静态方法。如果的子类没有实现抽象父类中的所有抽象方法，那么子类也必须定义为abstract类型。
 
 接口（interface）可以说成是抽象类的一种特例，接口中的所有方法都必须是抽象的。接口中的方法定义默认为public abstract类型，接口中的成员变量类型默认为public static final。
 
@@ -120,21 +123,14 @@ eclipse下不报错，但应该也不行），但接口中的抽象方法只能�
 #### 继承
 
 - 初始化顺序：
-
-- ```markdown
-  
-  ```
-1. 父类静态块与静态函数
-    2. 子类静态块与静态函数
-    3. 父类构造函数
-    4. 子类构造函数
-    ```
-
-    
-    
+	1. 父类静态块与静态函数
+	2. 子类静态块与静态函数
+	3. 父类构造函数
+	4. 子类构造函数
+    ```Markdown
     **注意**：静态块只执行一次，按顺序执行
     
-    在Java里，只有值传递，因为引用本身就是一个地址值，我们说的”传递引用“本质上也是“值传递”，只不过传递的是地址值。
+  在Java里，只有值传递，因为引用本身就是一个地址值，我们说的”传递引用“本质上也是“值传递”，只不过传递的是地址值。
     
     在方法中，改变一个对象参数的引用不会影响到原始引用。这是很自然的。
     
@@ -172,6 +168,22 @@ Son s1 = (Son) f1; //此处将f1重新交给son对象引用,原因是因为f1的
 | 同包         | √      | √         | √       |         |
 | 不同包子类   | √      | √         |         |         |
 | 不同包非子类 | √      |           |         |         |
+
+#### 内部类
+
+> 一个类定义在另一个类的内部，这个类就是Inner Class,Inner Class的实例不能单独存在，必须依附于一个Outer Class的实例
+>
+> 除了能引用Outer实例外，还可以修改Outer Class的`private`字段
+
+内部类实例化
+
+`Outer.Inner inner = outer.new Inner()`
+
+##### 匿名内部类
+
+##### 静态内部类
+
+它不再依附于`Outer`的实例，而是一个完全独立的类，因此无法引用`Outer.this`，但它可以访问`Outer`的`private`静态字段和静态方法。
 
 ### 一些工具类
 
@@ -216,6 +228,20 @@ public String(int[] codePoints, int offset, int count)//也可以是Unicode编�
 
 > - 直接使用双引号声明出来的`String`对象会直接存储在常量池中。
 > - 如果不是用双引号声明的`String`对象，可以使用`String`提供的`intern`方法。intern 方法会从字符串常量池中查询当前字符串是否存在，若不存在就会将当前字符串放入常量池中,存在则把该字符串的地址返回给String对象
+> - new String(b)会在常量池中创建一个b对象,在堆中创建一个String对象引用b对象的地址
+>
+> 问题来了,那intern还有什么用?
+>
+> ```java
+> //考虑这样一个string
+> String a=new String(1)+new String(1);
+> //常量池中只有1,这个常量.而a所指向则为11,这时调用intern则会把11加入常量池(jdk1.6)或者把a所引用的对象加入常量池(jdk1.7)
+> ```
+>
+
+jdk1.7的改变
+- 将String常量池 从 Perm 区移动到了 Java Heap区
+- String#intern 方法时，如果存在堆中的对象，会直接保存对象的引用，而不会重新创建对象。
 
 ```java
 public static void main(String[] args) {
@@ -234,6 +260,26 @@ public static void main(String[] args) {
 String s = new String("abc")创建两个对象.
 
 ![image-20201106193406234](https://raw.githubusercontent.com/TestLove/Pictures/main/img/new%E4%B8%8E%E7%9B%B4%E6%8E%A5%E5%BC%95%E7%94%A8%E7%9A%84%E5%8C%BA%E5%88%AB.png)
+
+```java
+//那这样呢
+String a=new String("emtf");
+String b=new String("nhm");
+String c=a+b;//创建一个对象
+String d="i"+"love";
+//idea真香
+String a = new String("emtf");
+String b = new String("nhm");
+(new StringBuilder()).append(a).append(b).toString();
+String d = "ilove";
+```
+
+##### 总结
+
+1. new String(A)总会在堆中创建一个String对象,如果常量池中无A,则把A加入常量池,有则直接返回该地址给String对象
+2. String s3 = new String("1") + new String("1"),只会把1加入常量池,然鹅11则不会被加入
+3. 在2的情况下调intern会把11的引用加入常量池,而不是直接创一个常量对象(jdk1.7) 
+4. 字符串相加,常量会自动优化,变量会创建一个StringBuilder对象进行连接
 
 ## 语法
 
@@ -276,9 +322,46 @@ System.out.println("Hello");
 
 ## 注解
 
+> 什么是注解
+>
+> Java注解又称Java标注，是JDK5.0版本开始支持加入源代码的特殊语法元数据。
+>  Java语言中的类、方法、变量、参数和包等都可以被标注。和Javadoc不同，Java标注可以通过反射获取标注内容。在编译器生成类文件时，标注可以被嵌入到字节码中。Java虚拟机可以保留标注内容，在运行时可以获取到标注内容。 当然它也支持自定义Java标注。
+
 ### 自定义注解
 
-**@Target：**
+> 可以通过元注解定义注解
+
+#### **举个栗子**
+
+```java
+@Inherited
+@Documented
+@Target({ ElementType.METHOD, ElementType.TYPE })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface SysLog {
+    LogType value() default LogType.ALL;
+    String prefix() default "";
+
+}
+```
+
+#### 格式要求
+
+**定义注解格式：**
+　　public @interface 注解名 {定义体}
+
+**注解参数的可支持数据类型：**
+
+　1.所有基本数据类型（int,float,boolean,byte,double,char,long,short)
+　2.String类型
+　3.Class类型
+　4.enum类型
+　5.Annotation类型
+　6.以上所有类型的数组
+
+#### 元注解详解
+
+##### **@Target**
 
 > @Target说明了Annotation所修饰的对象范围：Annotation可被用于 packages、types（类、接口、枚举、Annotation类型）、类型成员（方法、构造方法、成员变量、枚举值）、方法参数和本地变量（如循环变量、catch参数）。在Annotation类型的声明中使用了target可更加明晰其修饰的目标。
 
@@ -294,17 +377,168 @@ System.out.println("Hello");
 　　　　6.PARAMETER:用于描述参数
 　　　　7.TYPE:用于描述类、接口(包括注解类型) 或enum声明
 
-**定义注解格式：**
-　　public @interface 注解名 {定义体}
+##### @Retention
 
-　　**注解参数的可支持数据类型：**
+> 描述注解的生命周期，取值有：
+>
+>  默认RetentionPolicy.CLASS 值
 
-　　　　1.所有基本数据类型（int,float,boolean,byte,double,char,long,short)
-　　　　2.String类型
-　　　　3.Class类型
-　　　　4.enum类型
-　　　　5.Annotation类型
-　　　　6.以上所有类型的数组
+1. RetentionPolicy.SOURCE   源码中保留，编译期可以处理
+2. RetentionPolicy.CLASS   Class文件中保留，Class加载时可以处理
+3. RetentionPolicy.RUNTIME 运行时保留，运行中可以处理
+
+##### @Inherited
+
+> 标记注解，使用@Inherited修饰的注解作用于一个类，则该注解将被用于该类的子类。`@Inherited`仅针对`@Target(ElementType.TYPE)`类型的`annotation`有效，并且仅针对`class`的继承，对`interface`的继承无效：
+
+##### @Documented
+
+> 描述注解可以文档化，是一个标记注解。
+> 在生成javadoc的时候，是不包含注解的，但是如果注解被@Documented修饰，则生成的文档就包含该注解。
+
+
+
+## 反射
+
+> 通过`Class`实例获取`class`信息的方法称为反射
+>
+> 反射是为了解决在运行期，对某个实例一无所知的情况下，如何调用其方法
+
+### 通过class获取Class实例
+
+1. 直接通过一个`class`的静态变量`class`获取：
+
+   ```java
+   Class cls = String.class;
+   ```
+2. 如果我们有一个实例变量，可以通过该实例变量提供的getClass()方法获取：
+
+	```java
+	String s = "Hello";
+	Class cls = s.getClass()
+	```
+
+3. 如果知道一个`class`的完整类名，可以通过静态方法`Class.forName()`获取：
+
+   ```java
+   Class cls = Class.forName("java.lang.String");
+   ```
+
+- 因为`Class`实例在JVM中是唯一的，所以，上述方法获取的`Class`实例是同一个实例。可以用`==`比较两个`Class`实例：
+
+- 用`instanceof`不但匹配指定类型，还匹配指定类型的子类。而用`==`判断`class`实例可以精确地判断数据类型，但不能作子类型比较。
+
+- 通常情况下，我们应该用`instanceof`判断数据类型，因为面向抽象编程的时候，我们不关心具体的子类型。只有在需要精确判断一个类型是不是某个`class`的时候，我们才使用`==`判断`class`实例。
+- 注意到数组（例如`String[]`）也是一种`Class`，而且不同于`String.class,[Ljava.lang.String`。此外，JVM为每一种基本类型如int也创建了`Class`，通过`int.class`访问。
+
+### 通过Class实例重新创建class：
+
+```java
+// 获取String的Class实例:
+Class cls = String.class;
+// 创建一个String实例:
+String s = (String) cls.newInstance();//这种方法只能进行无参构造
+```
+
+JVM总是动态加载`class`，可以在运行期根据条件来控制加载class。
+
+### 获取信息
+
+#### 访问字段
+
+```java
+Field getField(name);//根据字段名获取某个public的field（包括父类）
+Field getDeclaredField(name);//根据字段名获取当前类的某个field（不包括父类）
+Field[] getFields();//获取所有public的field（包括父类）
+Field[] getDeclaredFields();//获取当前类的所有field（不包括父类）
+//Field类重写后的toString方法
+public String toString() {
+    int mod = getModifiers();
+    return (((mod == 0) ? "" : (Modifier.toString(mod) + " "))//修饰符
+         + getType().getTypeName() + " "//类型
+         + getDeclaringClass().getTypeName() + "."//类名
+         + getName());//名称
+    }
+```
+
+#### 获取字段值
+
+1. 先获取`Class`实例，再获取`Field`实例
+2. 调用`Field.setAccessible(true)`(无论该字段是否公有,都可以获取到值)
+3. 然后，用`Field.get(Object)`获取指定实例的指定字段的值
+
+注意:无法直接获得私有变量的值
+
+#### 设置字段值
+
+1. 先获取`Class`实例，再获取`Field`实例
+2. 调用`Field.setAccessible(true)`(无论该字段是否公有,都可以设置值)
+3. 通过` Field.set(Object, Object)`实现，其中第一个`Object`参数是指定的实例，第二个`Object`参数是待修改的值
+
+#### 访问方法
+
+```java
+Method getMethod(name, Class...)//获取某个public的Method（包括父类）
+Method getDeclaredMethod(name, Class...)//获取当前类的某个Method（不包括父类）
+Method[] getMethods()//获取所有public的Method（包括父类）
+Method[] getDeclaredMethods()//获取当前类的所有Method（不包括父类）
+```
+
+#### 调用方法
+
+1. 先获取`Class`实例，再获取Method实例
+2. 调用`Method.setAccessible(true)`(无论该字段是否公有,都可以设置值)
+3. 通过` Method.invoke(Object, args)`实现，其中第一个`Object`参数是指定的实例，第二个`args`参数是方法的参数
+
+如果获取到的Method表示一个静态方法，调用静态方法时，由于无需指定实例对象，所以`invoke`方法传入的第一个参数永远为`null`
+
+使用反射调用方法时，仍然遵循多态原则：即总是调用实际类型的覆写方法（如果存在）
+
+#### 调用构造方法
+
+```java
+Constructor getConstructor(Class...)//获取某个public的Constructor；
+Constructor getDeclaredConstructor(Class...)//获取某个Constructor；
+Constructor[] getConstructors()//获取所有public的Constructor；
+Constructor[] getDeclaredConstructors()//获取所有Constructor。
+```
+
+通过`Constructor`实例可以创建一个实例对象：`newInstance(Object... parameters)`； 通过设置`setAccessible(true)`来访问非`public`构造方法。
+
+#### 获取继承关系
+
+```java
+Class getSuperclass()//获取父类类型；
+Class[] getInterfaces()//获取当前类实现的所有接口。
+```
+
+如果是两个`Class`实例，要判断一个向上转型是否成立，可以调用`isAssignableFrom()`：
+
+#### 使用动态代理
+
+在运行期动态创建一个`interface`实例的方法如下：
+
+1. 定义一个`InvocationHandler`实例，它负责实现接口的方法调用；
+
+2. 通过
+
+   ```
+   Proxy.newProxyInstance()
+   ```
+
+   创建
+
+   ```
+   interface
+   ```
+
+   实例，它需要3个参数：
+
+   1. 使用的`ClassLoader`，通常就是接口类的`ClassLoader`；
+   2. 需要实现的接口数组，至少需要传入一个接口进去；
+   3. 用来处理接口方法调用的`InvocationHandler`实例。
+
+3. 将返回的`Object`强制转型为接口。
 
 ## 流与文件
 
@@ -615,7 +849,7 @@ assert 条件:表达式;
 logging/LoggingImageViewer.java
 ![image-20200723151904539](https://raw.githubusercontent.com/TestLove/Pictures/main/img/image-20200723151904539.png)
 ![image-20201106183645440](https://raw.githubusercontent.com/TestLove/Pictures/main/img/image-20201106183645440.png)
-![image-20200723151935355](E:\Typora\java.assets\image-20200723151935355.png)
+![image-20200723151935355](E:\Typora\java\java.assets\image-20200723151935355.png)
 ![image-20200723151949683](E:\Typora\java.assets\image-20200723151949683.png)
 !![image-20201107100347765](https://raw.githubusercontent.com/TestLove/Pictures/main/img/image-20201107100347765.png)
 ![image-20200723152056584](https://raw.githubusercontent.com/TestLove/Pictures/main/img/image-20200723152056584.png)
@@ -716,10 +950,10 @@ public interface Iterable<E>{
 
 #### ArrayList
 
-> ```markdown
-> 1. Resizable-array implementation of the List interface.  Implements all optional list operations, and permits all elements, including null. 
-> 2. (This class is roughly equivalent to <tt>Vector</tt>, except that it is unsynchronized.)
-> ```
+> 
+> 1. Resizable-array implementation of the List interface.  Implements all optional list operations, and permits all elements, including **<tt>null</tt>**. 
+> 2. (This class is roughly equivalent to <tt>Vector</tt>, except that it is <tt>**unsynchronized**</tt>.)
+> 
 
 **初始容量为十**
 
@@ -728,6 +962,22 @@ public interface Iterable<E>{
  * Default initial capacity.
  */
 private static final int DEFAULT_CAPACITY = 10;
+```
+
+#### HashMap
+
+> 1. This implementation provides all of the optional map operations, and permits <tt>null</tt> values and the <tt>null</tt> key
+> 2. (The <tt>HashMap</tt>class is roughly equivalent to <tt>Hashtable</tt>, except that it is **unsynchronized** and **permits nulls**.) 
+
+#### HashTable
+
+> 1. Any non-<code>null</code> object can be used as a key or as a value.
+> 2. 线程安全
+> 
+
+```markdown
+If a thread-safe implementation is not needed,use HashMap
+If a thread-safe highly-concurrent implementation is desired,use ConcurrentHashMap
 ```
 
 #### 散列集
@@ -1039,7 +1289,7 @@ tasklist|findstr"8696" #查看指定端口的进程
 
 **方法引用:**双冒号语法
 
-![image-20201024100453176](E:\Typora\java.assets\image-20201024100453176.png)
+![image-20201024100453176](https://raw.githubusercontent.com/TestLove/Pictures/main/img/lambda.png)
 
 ## JavaBean
 
@@ -1058,7 +1308,7 @@ JFrame 类的常用构造方法如下所示。
 
 ### 概览
 
-> ![image-20200926105148907](E:\Typora\java.assets\image-20200926105148907.png)
+> ![image-20200926105148907](https://raw.githubusercontent.com/TestLove/Pictures/main/img/ilambda.png)
 
 ### 引入
 
