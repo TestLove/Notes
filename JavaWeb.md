@@ -32,7 +32,7 @@
 
 ### ServletRequset接口
 
-> 
+> Servlet容器对于接受到的每一个Http请求，都会创建一个ServletRequest对象，并把这个对象传递给Servlet的Sevice( )方法
 
 ### Javax.servlet.http
 
