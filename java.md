@@ -320,6 +320,39 @@ System.out.println("Hello");
 
 # Java高级知识
 
+## JDBC
+
+加载驱动程序：
+
+```java
+Class.forName(driverClass)
+//加载MySql驱动
+Class.forName("com.mysql.jdbc.Driver")
+//加载Oracle驱动
+Class.forName("oracle.jdbc.driver.OracleDriver")
+```
+
+获得数据库连接：
+
+```java
+DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/imooc", "root", "root");
+```
+
+创建Statement\PreparedStatement对象：
+
+```java
+conn.createStatement();
+conn.prepareStatement(sql);
+```
+
+进行增删改查
+
+```java
+
+```
+
+
+
 ## 注解
 
 > 什么是注解

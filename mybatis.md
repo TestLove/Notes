@@ -40,7 +40,7 @@ try {
 
 # xml映射器
 
-> ![映射标签](E:\Typora\mybatis.assets\image-20200921185818313.png)
+> ![映射标签](https://raw.githubusercontent.com/TestLove/Pictures/main/img/image-20200921185818313.png)
 
 ## select
 
